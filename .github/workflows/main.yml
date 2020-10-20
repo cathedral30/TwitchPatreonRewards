@@ -26,4 +26,6 @@ jobs:
           java-version: '11'
 
       - name: Run a gradle build
-        run: ./gradlew build
+        run: |
+          chmod +x gradlew
+          ./gradlew build
