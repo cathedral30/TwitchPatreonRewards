@@ -1,10 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<link>
     <meta charset="UTF-8">
-    <title>Login - Twitch</title>
+    <title>Login - Patreon</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
 </head>
 <body>
-
+    <form th:action=
+                  "@{http://www.patreon.com/oauth2/authorize(
+                  response_type=code,
+                  client_id=${patreonAuth.id},
+                  redirect_uri=${patreonAuth.uri},
+                  scope=${patreonAuth.scopes},
+                  state=${patreonAuth.state}
+                  )}"
+    >
+        <button class="btn btn-lg btn-warning btn-block">Log in with Patreon</button>
+    </form>
 </body>
 </html>
