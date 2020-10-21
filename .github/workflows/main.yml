@@ -29,7 +29,11 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew build
-          
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    
+    steps:
       - run: 'which ssh-agent || ( apt-get install -qq openssh-client )'
       - run: eval $(ssh-agent -s)
       - run: touch private_key
