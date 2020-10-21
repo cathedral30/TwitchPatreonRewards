@@ -42,4 +42,4 @@ jobs:
           PRIVATE_SSH: ${{ secrets.PRIVATE_SSH }}
         run: echo "$PRIVATE_SSH" >> private_key
       - run: chmod 400 private_key
-      - run: ssh -i private_key -p 22 -o StrictHostKeyChecking=no site@139.162.223.18 "./deploy2.sh"
+      #- run: ssh -i private_key -p 22 -o StrictHostKeyChecking=no site@139.162.223.18 "./deploy2.sh"
