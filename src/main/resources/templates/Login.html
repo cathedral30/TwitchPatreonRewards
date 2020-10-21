@@ -7,15 +7,10 @@
     <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
 </head>
 <body>
-    <form th:action=
-                  "@{http://www.patreon.com/oauth2/authorize(
-                  response_type=code,
-                  client_id=${patreonAuth.id},
-                  redirect_uri=${patreonAuth.uri},
-                  scope=${patreonAuth.scopes},
-                  state=${patreonAuth.state}
-                  )}"
-    >
+    <form action="http://www.patreon.com/oauth2/authorize" method="get">
+        <input type="hidden" name="response_type" value="code" />
+        <input type="hidden" name="client_id" th:value="${patreonAuth.id}" />
+        <input type="hidden" name="redirect_uri" th:value="${patreonAuth.uri}" />
         <button class="btn btn-lg btn-warning btn-block">Log in with Patreon</button>
     </form>
 </body>

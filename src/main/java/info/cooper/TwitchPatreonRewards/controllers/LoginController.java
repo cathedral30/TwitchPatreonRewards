@@ -14,14 +14,12 @@ public class LoginController {
     @Value("${patreon.client.id}")
     private String clientId;
 
-    @Value("${patreon.secret}")
-    private String secret;
-
-    private PatreonAuth patreonAuth;
+    @Value("${patreon.redirect}")
+    private String uri;
 
     @RequestMapping(method= RequestMethod.GET)
     public String getLogin(Model model) {
-        patreonAuth = new PatreonAuth(clientId, secret, new String[]{}, "");
+        PatreonAuth patreonAuth = new PatreonAuth(clientId, uri, new String[]{}, "");
         model.addAttribute("patreonAuth", patreonAuth);
         return "Login";
     }
