@@ -1,19 +1,18 @@
 package info.cooper.TwitchPatreonRewards.patreon;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
+import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
 @Service
 public class PatreonRequests {
 
-    public void validateOAuthCode(String code, String clientId, String secret, String uri) throws IOException {
+    public JSONObject validateOAuthCode(String code, String clientId, String secret, String uri) throws IOException {
         URL url = new URL("https://www.patreon.com/api/oauth2/token");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("POST");
@@ -47,18 +46,55 @@ public class PatreonRequests {
         in.close();
         con.disconnect();
 
-        System.out.println(content);
+        String strContent = String.valueOf(content);
+        return new JSONObject(strContent);
+    }
+
+    public JSONObject refreshOAuthToken(String refreshToken, String clientId, String secret) throws IOException {
+        URL url = new URL("https://www.patreon.com/api/oauth2/token");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("grant_type", "refresh_token");
+        parameters.put("refresh_token", refreshToken);
+        parameters.put("client_id", clientId);
+        parameters.put("client_secret", secret);
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        con.setConnectTimeout(5000);
+        con.setReadTimeout(5000);
+
+        int status = con.getResponseCode();
+
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer content = new StringBuffer();
+        while ((inputLine = in.readLine()) != null) {
+            content.append(inputLine);
+        }
+        in.close();
+        con.disconnect();
+
+        String strContent = String.valueOf(content);
+        return new JSONObject(strContent);
     }
 
     // https://www.baeldung.com/java-http-request
-    public static String getParamsString(Map<String, String> params)
-            throws UnsupportedEncodingException {
+    public static String getParamsString(Map<String, String> params) {
         StringBuilder result = new StringBuilder();
 
         for (Map.Entry<String, String> entry : params.entrySet()) {
-            result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
+            result.append(URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8));
             result.append("=");
-            result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+            result.append(URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8));
             result.append("&");
         }
 
