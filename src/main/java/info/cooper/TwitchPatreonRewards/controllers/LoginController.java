@@ -1,11 +1,14 @@
 package info.cooper.TwitchPatreonRewards.controllers;
 
 import info.cooper.TwitchPatreonRewards.patreon.PatreonAuth;
+import info.cooper.TwitchPatreonRewards.security.EncryptService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
 
 @Controller
 @RequestMapping(value="/login")
@@ -16,6 +19,9 @@ public class LoginController {
 
     @Value("${patreon.redirect}")
     private String uri;
+
+    @Autowired
+    EncryptService encryptService;
 
     @RequestMapping(method= RequestMethod.GET)
     public String getLogin(Model model) {

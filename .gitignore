@@ -33,3 +33,6 @@ out/
 ### VS Code ###
 .vscode/
 /src/main/resources/application1.properties
+
+
+/src/main/resources/keys/
