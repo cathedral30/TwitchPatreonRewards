@@ -46,15 +46,16 @@ public class EncryptService {
         return kf.generatePublic(spec);
     }
 
-    public String encryptText(String msg, PrivateKey key)
-            throws IllegalBlockSizeException,
-            BadPaddingException, InvalidKeyException {
+    public String encryptText(String msg)
+            throws Exception {
+        PrivateKey key = getPrivate();
         this.cipher.init(Cipher.ENCRYPT_MODE, key);
         return Base64.encodeBase64String(cipher.doFinal(msg.getBytes(StandardCharsets.UTF_8)));
     }
 
-    public String decryptText(String msg, PublicKey key)
-            throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+    public String decryptText(String msg)
+            throws Exception {
+        PublicKey key = getPublic();
         this.cipher.init(Cipher.DECRYPT_MODE, key);
         return new String(cipher.doFinal(Base64.decodeBase64(msg)), StandardCharsets.UTF_8);
     }

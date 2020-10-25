@@ -87,6 +87,43 @@ public class PatreonRequests {
         return new JSONObject(strContent);
     }
 
+    public PatreonUser getPatreonUser(String token) throws IOException {
+        URL url = new URL("https://patreon.com/api/oauth2/api/current_user");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
+        con.setRequestProperty("Authorization", "Bearer " + token);
+
+        con.setConnectTimeout(5000);
+        con.setReadTimeout(5000);
+
+        int status = con.getResponseCode();
+
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer content = new StringBuffer();
+        while ((inputLine = in.readLine()) != null) {
+            content.append(inputLine);
+        }
+        in.close();
+        con.disconnect();
+
+        String strContent = String.valueOf(content);
+        JSONObject data = new JSONObject(strContent).getJSONObject("data");
+        Long id = data.getLong("id");
+        JSONObject attributes = data.getJSONObject("attributes");
+        return new PatreonUser(
+                id,
+                attributes.getString("about"),
+                attributes.getString("email"),
+                attributes.getString("first_name"),
+                attributes.getString("last_name"),
+                attributes.getString("image_url"),
+                attributes.getString("thumb_url"),
+                attributes.getString("url")
+        );
+    }
+
     // https://www.baeldung.com/java-http-request
     public static String getParamsString(Map<String, String> params) {
         StringBuilder result = new StringBuilder();

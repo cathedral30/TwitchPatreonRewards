@@ -1,6 +1,7 @@
 package info.cooper.TwitchPatreonRewards.repo;
 
 import info.cooper.TwitchPatreonRewards.patreon.PatreonKey;
+import info.cooper.TwitchPatreonRewards.security.EncryptService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -13,6 +14,7 @@ public class PatreonKeysRepo {
 
     private final JdbcTemplate jdbcTemplate;
     private final RowMapper<PatreonKey> patreonKeyMapper;
+    private EncryptService encryptService;
 
     String findById = "Select * from patreonkeys where idpatreonKeys=?";
 
@@ -25,16 +27,30 @@ public class PatreonKeysRepo {
     String updateKey = "update patreonkeys set accessToken = ?, expires = ?, refreshToken = ? where idpatreonKeys = ?";
 
     @Autowired
-    public PatreonKeysRepo(JdbcTemplate aTemplate) {
+    public PatreonKeysRepo(JdbcTemplate aTemplate, EncryptService anEncryptService) {
         jdbcTemplate = aTemplate;
+        encryptService = anEncryptService;
 
-        patreonKeyMapper = (rs, i) -> new PatreonKey(
-                rs.getLong("idpatreonKeys"),
-                rs.getString("accessToken"),
-                rs.getLong("expires"),
-                rs.getString("refreshToken"),
-                rs.getLong("patreonId")
-        );
+        patreonKeyMapper = (rs, i) -> {
+            try {
+                return new PatreonKey(
+                        rs.getLong("idpatreonKeys"),
+                        encryptService.decryptText(rs.getString("accessToken")),
+                        rs.getLong("expires"),
+                        rs.getString("refreshToken"),
+                        rs.getLong("patreonId")
+                );
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return new PatreonKey(
+                    rs.getLong("idpatreonKeys"),
+                    rs.getString("accessToken"),
+                    rs.getLong("expires"),
+                    rs.getString("refreshToken"),
+                    rs.getLong("patreonId")
+            );
+        };
     }
 
     public PatreonKey findById(Long id) {
@@ -46,12 +62,22 @@ public class PatreonKeysRepo {
     }
 
     public PatreonKey findByAccessToken(String token) {
-        return jdbcTemplate.queryForObject(findByAccessToken, new Object[]{token}, patreonKeyMapper);
+        try {
+            String encryptedToken = encryptService.encryptText(token);
+            return jdbcTemplate.queryForObject(findByAccessToken, new Object[]{encryptedToken}, patreonKeyMapper);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return jdbcTemplate.queryForObject(findByAccessToken, new Object[]{token}, patreonKeyMapper);
+        }
     }
 
     public Integer createKey(String token, Long expires, String refreshToken, Long id) {
         ArrayList<Object> params = new ArrayList<>();
-        params.add(token);
+        try {
+            params.add(encryptService.encryptText(token));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         params.add(expires);
         params.add(refreshToken);
         params.add(id);
@@ -60,7 +86,11 @@ public class PatreonKeysRepo {
 
     public Integer updateKey(String token, Long expires, String refreshToken, Long id) {
         ArrayList<Object> params = new ArrayList<>();
-        params.add(token);
+        try {
+            params.add(encryptService.encryptText(token));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         params.add(expires);
         params.add(refreshToken);
         params.add(id);
