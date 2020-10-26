@@ -8,7 +8,7 @@ import lombok.Data;
 public class PatreonKey {
     Long id;
     String token;
-    Long expires;
+    Integer expires;
     String refreshToken;
     Long patreonId;
 }
