@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<link>
+    <meta charset="UTF-8">
+    <title>Profile</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+</head>
+<body>
+    <p>Hello <span th:text="${user.fName}"></span> <span th:text="${user.lName}"></span>!</p>
+</body>
+</html>

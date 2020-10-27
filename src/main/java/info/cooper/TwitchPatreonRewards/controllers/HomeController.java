@@ -87,8 +87,8 @@ public class HomeController {
                 e.printStackTrace();
                 //unencrypted_patreon_token = patreon_token;
             }
-            Long id = Long.getLong(patreon_id);
-            PatreonKey databaseUser = patreonKeysRepo.findById(id);
+            Long id = Long.parseLong(patreon_id);
+            PatreonKey databaseUser = patreonKeysRepo.findByPatreonId(id);
             PatreonKey databaseUser1 = patreonKeysRepo.findByAccessToken(unencrypted_patreon_token);
             if (databaseUser != null && databaseUser1 != null) {
                 if (databaseUser.getToken().equals(databaseUser1.getToken())) {
